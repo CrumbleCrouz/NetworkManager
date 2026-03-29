@@ -5,8 +5,8 @@ from pathlib import Path
 
 def load_config() -> dict:
     """
-    Loads config file
-    :return: the loaded config
+    Loads config file.
+    :return: the loaded config.
     """
     config_path = Path(__file__).parent.parent.absolute() / "config.json"
     try:
@@ -19,8 +19,8 @@ def load_config() -> dict:
 
 def save_config(config: dict) -> None:
     """
-    Saves config file
-    :param config: The program config
+    Saves config file.
+    :param config: The program config.
     """
     config_path = Path(__file__).parent.parent.absolute() / "config.json"
     try:

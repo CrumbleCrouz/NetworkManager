@@ -10,7 +10,7 @@ import os
 
 def main():
     """
-    Main function
+    Main function.
     """
     enable_ansi()
     clear_cmd()

@@ -1,11 +1,14 @@
 def clear_cmd() -> None:
     """
-        Clears the screen
+    Clears the screen.
     """
     print("\033[H\033[J", end="")
 
 
 def show_main_menu(index: int = 0) -> None:
+    """
+    Displays the main menu.
+    """
     # ╔ ╗ ═ ║ ╠ ╦ ╬ ╩ ╣ ╚ ╝
     print(f"╔═════╦══════════════════════╗")
     print(f"║ [{'x' if index == 0 else ' '}] ║ Saved Configurations ║")

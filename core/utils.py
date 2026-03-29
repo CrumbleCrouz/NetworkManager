@@ -3,7 +3,7 @@ import ctypes
 import sys
 from typing import Callable
 
-def is_admin():
+def is_admin() -> bool:
     """
     Checks if the current user has admin privileges
     :return:
@@ -41,14 +41,12 @@ def run_as_admin(fn: Callable[[], None] = lambda: None) -> None:
         fn()
 
 
-def enable_ansi():
+def enable_ansi() -> None:
     """
     Enables ANSI escape code support in legacy Windows consoles.
     """
     kernel32 = ctypes.windll.kernel32
-    # 0xfffffff5 is the constant for STD_OUTPUT_HANDLE
     handle = kernel32.GetStdHandle(-11)
     mode = ctypes.c_uint()
     kernel32.GetConsoleMode(handle, ctypes.byref(mode))
-    # ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
     kernel32.SetConsoleMode(handle, mode.value | 0x0004)
