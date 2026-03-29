@@ -1,0 +1,13 @@
+{
+    "excludedAdapters": [
+        "docker",
+        "virtual",
+        "vmware",
+        "loopback",
+        "vethernet",
+        "hyper-v",
+        "nordlynx",
+        "vpn",
+        "bluetooth"
+    ]
+}
