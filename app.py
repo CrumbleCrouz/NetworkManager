@@ -1,5 +1,4 @@
 # Project Modules
-from core.manager import list_physical_adapters
 from core.utils import *
 from core.serialization import *
 from ui.controllers import *
@@ -15,13 +14,16 @@ def main():
     enable_ansi()
     clear_cmd()
     config = load_config()
-    while True:
-        main_menu()
-        list_physical_adapters(config)
-        break
+    main_menu(config)
     save_config(config)
-    os.system("pause")
 
 
 if __name__ == "__main__":
-    run_as_admin(main)
+    try:
+        run_as_admin(main)
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        print("Exiting program...")
+        os.system("pause")
