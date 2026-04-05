@@ -56,7 +56,7 @@ def current_configuration(config: dict) -> Int:
     """
     index = 0
     print("Fetching adapters...")
-    adapters = list_physical_adapters(config)
+    adapters = list_adapters(config)
     clear_cmd()
     show_current_configuration(index, adapters)
     while True:

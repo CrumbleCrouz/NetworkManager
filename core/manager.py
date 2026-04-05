@@ -2,26 +2,25 @@
 import wmi
 
 
-def list_physical_adapters(config: dict) -> list:
+def list_adapters(config: dict) -> list:
     """
-    Lists all physical adapters.
+    Lists all adapters not excluded.
     :param config: The program configuration.
-    :return: A List of physical adapters.
+    :return: A List of adapters.
     """
     c = wmi.WMI()
     all_adapters = c.Win32_NetworkAdapter(PhysicalAdapter=True)
-    real_adapters = []
+    adapters = []
 
     for adapter in all_adapters:
-        pnp_id = adapter.PNPDeviceID or ""
 
-        is_virtual = any(word in (adapter.Name + adapter.Description).lower()
+        is_excluded = any(word in (adapter.Name + adapter.Description).lower()
                          for word in config["excludedAdapters"])
 
 
-        if adapter.NetConnectionID and not is_virtual and pnp_id.startswith(("PCI\\", "USB\\")):
-            real_adapters.append(adapter)
-    return real_adapters
+        if adapter.NetConnectionID and not is_excluded:
+            adapters.append(adapter)
+    return adapters
 
 
 def get_adapter_details(adapter: wmi.WMIObject) -> dict | None:
