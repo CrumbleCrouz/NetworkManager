@@ -10,5 +10,6 @@
         "vpn",
         "tap-",
         "bluetooth"
-    ]
+    ],
+    "configurations": {}
 }

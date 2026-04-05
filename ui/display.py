@@ -28,6 +28,7 @@ def show_current_configuration(index: int = 0, adapters: list = []) -> None:
     :param adapters: A list containing all adapters.
     """
     max_name_length = max(len(adapter.Name) for adapter in adapters)
+    max_name_length = max(max_name_length, 7)  # 7 is the length of "Go back"
     print(f"╔═════╦═{'═' * max_name_length}═╗")
     c = 0
     for adapter in adapters:
@@ -39,11 +40,12 @@ def show_current_configuration(index: int = 0, adapters: list = []) -> None:
 
 def show_adapter_details(details: dict = None, name: str = "") -> None:
     """
-    Displays the saved configurations.
+    Displays the adapter details.
     :param details: Details of the adapter.
     :param name: Name of the adapter.
     """
-    # ╔ ╗ ═ ║ ╠ ╦ ╬ ╩ ╣ ╚ ╝
+    if details is None:
+        details = {}
     caution_1 = "\"N/A\" might indicate a non-existent"
     caution_2 = "connection, or undefined values"
     go_back = "Press Esc to go back"
@@ -59,3 +61,31 @@ def show_adapter_details(details: dict = None, name: str = "") -> None:
     print(f"║ {''.center(12 + max_length)} ║")
     print(f"║ {go_back.center(12 + max_length)} ║")
     print(f"╚═{'═' * (12 + max_length)}═╝")
+
+
+def show_created_configuration_menu(index: int = 0, configurations: dict = None):
+    """
+    Displays the saved configurations.
+    :param configurations: The saved configurations.
+    """
+
+    if configurations is None:
+        configurations = {}
+    indication_1 = "Select a created configuration"
+    indication_2 = "will edit it"
+    max_length = max(len(config["name"]) for config in configurations) if len(configurations) > 0 else 0
+    max_length = max(max_length, len(indication_1), len(indication_2), 24)  # 24 is the length of "Create new configuration"
+    print(f"╔═════╦═{'═' * max_length}═╗")
+    c = 0
+    for config in configurations:
+        print(
+            f"║ [{'x' if index == c else ' '}] ║ {config["name"] + ' ' * (max_length - len(config["name"]))} ║")
+        c += 1
+    print(f"║ [{'x' if index == c else ' '}] ║ Create new configuration{' ' * (max_length - 24)} ║")
+    print(f"║ [{'x' if index == c + 1 else ' '}] ║ Go back{' ' * (max_length - 7)} ║")
+    print(f"╠═{'═' * 3}═╩═{'═' * max_length}═╣")
+    print(f"║ {indication_1.center(6 + max_length)} ║")
+    print(f"║ {indication_2.center(6 + max_length)} ║")
+    print(f"║ {''.center(6 + max_length)} ║")
+    print(f"╚═{'═' * (max_length + 6)}═╝")
+    # ╔ ╗ ═ ║ ╠ ╦ ╬ ╩ ╣ ╚ ╝

@@ -20,8 +20,8 @@ def main():
 
 if __name__ == "__main__":
     try:
-        run_as_admin(main)
-
+        # run_as_admin(main)
+        main()
     except KeyboardInterrupt:
         pass
     finally:
