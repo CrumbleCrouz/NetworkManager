@@ -9,12 +9,22 @@ def load_config() -> dict:
     :return: the loaded config.
     """
     config_path = Path(__file__).parent.parent.absolute() / "config.json"
+    config = {}
     try:
         with open(config_path, 'r') as f:
             config = json.load(f)
-        return config
     except FileNotFoundError:
-        return {}
+        pass
+
+    for v in ["excludedAdapters", "configurations"]:
+        try:
+            config[v]
+        except KeyError: # Default values
+            config[v] = []
+            if v == "excludedAdapters":
+                config[v] = ["docker", "virtual", "vmware", "loopback", "vethernet",
+                             "hyper-v", "nordlynx", "vpn", "tap-", "bluetooth"]
+    return config
 
 
 def save_config(config: dict) -> None:

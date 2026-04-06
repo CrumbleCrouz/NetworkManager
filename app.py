@@ -14,7 +14,7 @@ def main():
     enable_ansi()
     clear_cmd()
     config = load_config()
-    main_menu(config)
+    config = main_menu(config)
     save_config(config)
 
 

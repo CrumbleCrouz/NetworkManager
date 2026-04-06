@@ -9,6 +9,7 @@ import msvcrt
 def main_menu(config: dict) -> dict:
     """
     Displays the main menu and handle the users input.
+    :type config: dict
     :param config: The program configuration.
     :return: The final config.
     """
@@ -37,7 +38,8 @@ def main_menu(config: dict) -> dict:
                         pass
                     case 1:  # Create new configuration
                         clear_cmd()
-                        config = created_configuration_menu(config)
+                        configurations = created_configuration_menu(config)
+                        config["configurations"] = configurations
                         clear_cmd()
                         show_main_menu(index)
                     case 2:  # See current configuration
@@ -121,7 +123,7 @@ def created_configuration_menu(config: dict) -> dict:
     """
     Displays the created network configurations menu and handle the users input.
     :param config: The program configuration.
-    :return: The updated program configuration.
+    :return: The updated network configurations.
     """
     index = 0
     configurations = None
@@ -129,8 +131,8 @@ def created_configuration_menu(config: dict) -> dict:
         configurations = config["configurations"]
     except:
         pass
-    if configurations is None or len(configurations) == 0:
-        configurations = {}
+    if configurations is None:
+        configurations = []
     clear_cmd()
     show_created_configuration_menu(0, configurations)
     while True:
@@ -151,35 +153,54 @@ def created_configuration_menu(config: dict) -> dict:
                             show_created_configuration_menu(index, configurations)
                     case _: pass
             if key == b'\r': # Enter key
-                if index == len(configurations) + 1:
+                if index == len(configurations) + 1:  # Go Back
                     break
-                pass # TODO
+                if index == len(configurations):  # Create new configuration
+                    new_config = create_or_edit_configuration(configurations)
+                    if new_config is not None:
+                        configurations.append(new_config)
+                    clear_cmd()
+                    show_created_configuration_menu(index, configurations)
+                else:  # Edit configuration
+                    updated_configuration = create_or_edit_configuration(configurations, configurations[index], False, index)
+                    if updated_configuration is not None:
+                        configurations[index] = updated_configuration
+                    clear_cmd()
+                    show_created_configuration_menu(index, configurations)
 
             if key == b'\x1b': # Esc Key
                 break
 
-    config["configurations"] = configurations
-    return config
+    return configurations
 
 
-def create_or_edit_configuration(configuration: dict = None) -> dict:
+def create_or_edit_configuration(configurations: list, configuration: dict = None, create: bool = True, config_index:int = 0) -> dict | None:
     """
-    Displays the created network configurations menu and handle the users input.
-    :param configuration: The program configuration.
-    :return: The updated program configuration.
+    Displays the menu to create or update network configuration and handle the users input.
+    :param configurations: All the network configurations, used to verify name uniqueness.
+    :param configuration: The network configuration to update.
+    :param create: True if the user is creating a new configuration,
+                   False if the user is editing an existent configuration.
+   :param config_index: The index of the configuration in the configurations list.
+    :return: The created / updated configuration or None if aborted.
     """
-    # FIXME: copy pasted function, adapt it.
+    if configuration is None:
+        configuration = {
+            "Name": "New Configuration",
+            "DHCP": False,
+            "IP": None,
+            "Mask": None,
+            "Gateway": None,
+            "DNS": []
+        }
     index = 0
-    configurations = None
-    try:
-        configurations = config["configurations"]
-    except:
-        pass
-    if configurations is None or len(configurations) == 0:
-        configurations = {}
     clear_cmd()
-    show_created_configuration_menu(0, configurations)
+    show_create_or_edit_configuration(0, configuration, create)
     while True:
+        if configuration["DHCP"]:
+            max_index = 3
+        else:
+            max_index = len(configuration.keys()) + len(configuration["DNS"]) + 1
         if msvcrt.kbhit():
             key = msvcrt.getch()
             if key == b'\xe0': # Arrow Key
@@ -189,21 +210,130 @@ def create_or_edit_configuration(configuration: dict = None) -> dict:
                         if index > 0:
                             index -= 1
                             clear_cmd()
-                            show_created_configuration_menu(index, configurations)
+                            show_create_or_edit_configuration(index, configuration, create)
                     case b'P': # Down Arrow
-                        if index < len(configurations) + 1:
+                        if index < max_index:
                             index += 1
                             clear_cmd()
-                            show_created_configuration_menu(index, configurations)
+                            show_create_or_edit_configuration(index, configuration, create)
                     case _: pass
+
             if key == b'\r': # Enter key
-                if index == len(configurations) + 1:
+                if index == 0:  # Name
+                    name = input("Enter new Name: ")
+                    clear_cmd()
+                    show_create_or_edit_configuration(index, configuration, create)
+                    if name == "":
+                        print("Name cannot be empty!")
+                        continue
+                    elif len(name) > 64:
+                        print("Name cannot be longer than 64 characters!")
+                        continue
+                    elif len(configurations) > 0:
+                        if name.lower() in ([n["Name"].lower() for n in configurations]):
+                            print("A configuration with this name already exists!")
+                            continue
+                    configuration["Name"] = name
+                    clear_cmd()
+                    show_create_or_edit_configuration(index, configuration, create)
+                    print("Name updated!")
+                if (not configuration["DHCP"]) and index == 1:  # IP
+                    ip = input("Enter new IP: ")
+                    clear_cmd()
+                    show_create_or_edit_configuration(index, configuration, create)
+                    if ip == "":
+                        print("IP cannot be empty!")
+                    elif verify_ip(ip):
+                        configuration["IP"] = ip
+                        clear_cmd()
+                        show_create_or_edit_configuration(index, configuration, create)
+                        print("IP updated!")
+                    else:
+                        print("Invalid IP!")
+                if (not configuration["DHCP"]) and index == 2:  # Mask
+                    mask = input("Enter new Mask: ")
+                    clear_cmd()
+                    show_create_or_edit_configuration(index, configuration, create)
+                    if mask == "":
+                        print("Mask cannot be empty!")
+                    elif verify_ip(mask):
+                        configuration["Mask"] = mask
+                        clear_cmd()
+                        show_create_or_edit_configuration(index, configuration, create)
+                        print("Mask updated!")
+                    else:
+                        print("Invalid Mask!")
+                if (not configuration["DHCP"]) and index == 3:  # Gateway
+                    gateway = input("Enter new Gateway (can be None): ")
+                    clear_cmd()
+                    show_create_or_edit_configuration(index, configuration, create)
+                    if gateway == "" or gateway == "None":
+                        configuration["Gateway"] = None
+                        clear_cmd()
+                        show_create_or_edit_configuration(index, configuration, create)
+                        print("Gateway updated!")
+                    elif verify_ip(gateway):
+                        configuration["Gateway"] = gateway
+                        clear_cmd()
+                        show_create_or_edit_configuration(index, configuration, create)
+                        print("Gateway updated!")
+                    else:
+                        print("Invalid IP!")
+                if (not configuration["DHCP"]) and index in range(4, max_index - 2):  # DNS
+                    if index == max_index - 3:  # Add DNS
+                        dns = input("Enter new DNS: ")
+                        clear_cmd()
+                        show_create_or_edit_configuration(index, configuration, create)
+                        if dns == "":
+                            print("DNS cannot be empty!")
+                        elif verify_ip(dns):
+                            configuration["DNS"].append(dns)
+                            clear_cmd()
+                            show_create_or_edit_configuration(index, configuration, create)
+                            print("DNS added!")
+                        else:
+                            print("Invalid DNS!")
+                    else:  # Edit DNS
+                        dns_index = index - 4
+                        dns = input(f"Edit DNS {configuration["DNS"][dns_index]}: ")
+                        clear_cmd()
+                        show_create_or_edit_configuration(index, configuration, create)
+                        if dns == "":
+                            print("DNS cannot be empty!")
+                        elif verify_ip(dns):
+                            configuration["DNS"][dns_index] = dns
+                            clear_cmd()
+                            show_create_or_edit_configuration(index, configuration, create)
+                            print("DNS updated!")
+                        else:
+                            print("Invalid DNS!")
+
+                if index == max_index - 2:  # DHCP
+                    configuration["DHCP"] = not configuration["DHCP"]
+                    clear_cmd()
+                    if configuration["DHCP"]:
+                        index = 1
+                    else:
+                        index = len(configuration.keys()) + len(configuration["DNS"]) -1
+                    show_create_or_edit_configuration(index, configuration, create)
+                    print("DHCP updated")
+                if index == max_index - 1:  # Validate
+                    clear_cmd()
+                    show_create_or_edit_configuration(index, configuration, create)
+                    if len(configurations) > 0:
+                        config_name_list = [n["Name"].lower() for n in configurations]
+                        config_name_list.pop(config_index)
+                        if configuration["Name"].lower() in config_name_list:
+                            print("A configuration with this name already exists!")
+                            continue
+                    if verify_configuration(configuration):
+                        return configuration
+                    else:
+                        print("Cannot validate, invalid configuration!")
+                if index == max_index:  # Go back
                     break
-                pass # TODO
 
             if key == b'\x1b': # Esc Key
                 break
 
-    config["configurations"] = configurations
-    return config
-
+    return None
