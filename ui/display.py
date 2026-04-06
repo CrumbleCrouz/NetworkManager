@@ -15,7 +15,7 @@ def show_main_menu(index: int = 0) -> None:
     """
     print(f"╔═════╦═══════════════════════════╗")
     print(f"║ [{'x' if index == 0 else ' '}] ║ Saved configurations      ║ - Not implemented yet -")
-    print(f"║ [{'x' if index == 1 else ' '}] ║ Create new configuration  ║ - Not implemented yet -")
+    print(f"║ [{'x' if index == 1 else ' '}] ║ Manage configuration      ║ - Working on it -")
     print(f"║ [{'x' if index == 2 else ' '}] ║ See current configuration ║")
     print(f"║ [{'x' if index == 3 else ' '}] ║ Exit                      ║")
     print(f"╚═════╩═══════════════════════════╝")
@@ -63,26 +63,85 @@ def show_adapter_details(details: dict = None, name: str = "") -> None:
     print(f"╚═{'═' * (12 + max_length)}═╝")
 
 
-def show_created_configuration_menu(index: int = 0, configurations: dict = None):
+def show_created_configuration_menu(index: int = 0, configurations: dict = None) -> None:
     """
     Displays the saved configurations.
+    :param index: Starting index.
     :param configurations: The saved configurations.
     """
-
     if configurations is None:
         configurations = {}
+    create_config = "Create new configuration"
     indication_1 = "Select a created configuration"
     indication_2 = "will edit it"
+    go_back = "Go back"
     max_length = max(len(config["name"]) for config in configurations) if len(configurations) > 0 else 0
-    max_length = max(max_length, len(indication_1), len(indication_2), 24)  # 24 is the length of "Create new configuration"
+    max_length = max(max_length, len(indication_1), len(indication_2), len(create_config))
     print(f"╔═════╦═{'═' * max_length}═╗")
     c = 0
     for config in configurations:
         print(
             f"║ [{'x' if index == c else ' '}] ║ {config["name"] + ' ' * (max_length - len(config["name"]))} ║")
         c += 1
-    print(f"║ [{'x' if index == c else ' '}] ║ Create new configuration{' ' * (max_length - 24)} ║")
-    print(f"║ [{'x' if index == c + 1 else ' '}] ║ Go back{' ' * (max_length - 7)} ║")
+    print(f"║ [{'x' if index == c else ' '}] ║ {create_config + ' ' * (max_length - len(create_config))} ║")
+    print(f"║ [{'x' if index == c + 1 else ' '}] ║ {go_back + ' ' * (max_length - len(go_back))} ║")
+    print(f"╠═{'═' * 3}═╩═{'═' * max_length}═╣")
+    print(f"║ {indication_1.center(6 + max_length)} ║")
+    print(f"║ {indication_2.center(6 + max_length)} ║")
+    print(f"╚═{'═' * (max_length + 6)}═╝")
+
+
+def show_create_or_edit_configuration(index: int = 0, configuration: dict = None, create: bool = True) -> None:
+    """
+    Displays the saved configurations.
+    :param index: Starting index.
+    :param configuration: The new configuration.
+    :param create: True if the user is creating a new configuration,
+                   False if the user is editing an existent configuration.
+    """
+    if configuration is None:
+        configuration = {
+            "Name": "New Configuration",
+            "DHCP": dhcp,
+            "IP": None,
+            "Mask": None,
+            "Gateway": None,
+            "DNS": []
+        }
+    go_back = "Press Esc to go back"
+    validate = "Create new Configuration" if create else "Update Configuration"
+    add_dns = "create new DNS server"
+    indication_1 = "Type Enter to edit"
+    indication_2 = "the selected field"
+    dns_length = sum(len(dns) for dns in configuration["DNS"])
+    max_length = max((len(str(configuration[prop])) for prop in configuration.keys() if prop != "DNS"), default=0)
+    max_length = max(
+        max_length,
+        dns_length,
+        len(go_back),
+        len(validate),
+        len(add_dns),
+        len(indication_1),
+        len(indication_2),
+        len(configuration["Name"])
+        )
+    print(f"╔═════╦═{(' ' + configuration["Name"] + ' ').center(max_length + 2, '═')}═╗")
+    c = 0
+    if not configuration["DHCP"]:
+        for prop in configuration.keys():
+            if prop not in ["Name", "DHCP", "DNS"]:
+                print(f"║ [{'x' if index == c else ' '}] ║ {prop}: {configuration[prop] + ' ' * (max_length - len(configuration[prop]))} ║")
+            elif prop is "DNS":
+                print(f"║     ║ {prop}: {' ' * max_length} ║")
+                for srv in configuration[prop]:
+                    print(f"║ [{'x' if index == c else ' '}] ║  - {srv + ' ' * (max_length - len(srv))} ║")
+                    c += 1
+                print(f"║ [{'x' if index == c else ' '}] ║  - {add_dns + ' ' * (max_length - len(add_dns))} ║")
+        c += 1
+    print(f"║ [{'x' if index == c + 1 else ' '}] ║ DHCP: {configuration["DHCP"] + ' ' * (max_length - len(configuration["DHCP"]))} ║")
+    print(f"║ [{'x' if index == c + 2 else ' '}] ║ {validate + ' ' * (max_length - len(validate))} ║")
+    print(f"║ [{'x' if index == c + 2 else ' '}] ║ {go_back + ' ' * (max_length - len(go_back))} ║")
+
     print(f"╠═{'═' * 3}═╩═{'═' * max_length}═╣")
     print(f"║ {indication_1.center(6 + max_length)} ║")
     print(f"║ {indication_2.center(6 + max_length)} ║")

@@ -160,3 +160,50 @@ def created_configuration_menu(config: dict) -> dict:
 
     config["configurations"] = configurations
     return config
+
+
+def create_or_edit_configuration(configuration: dict = None) -> dict:
+    """
+    Displays the created network configurations menu and handle the users input.
+    :param configuration: The program configuration.
+    :return: The updated program configuration.
+    """
+    # FIXME: copy pasted function, adapt it.
+    index = 0
+    configurations = None
+    try:
+        configurations = config["configurations"]
+    except:
+        pass
+    if configurations is None or len(configurations) == 0:
+        configurations = {}
+    clear_cmd()
+    show_created_configuration_menu(0, configurations)
+    while True:
+        if msvcrt.kbhit():
+            key = msvcrt.getch()
+            if key == b'\xe0': # Arrow Key
+                arrow = msvcrt.getch()
+                match arrow:
+                    case  b'H': # Up Arrow
+                        if index > 0:
+                            index -= 1
+                            clear_cmd()
+                            show_created_configuration_menu(index, configurations)
+                    case b'P': # Down Arrow
+                        if index < len(configurations) + 1:
+                            index += 1
+                            clear_cmd()
+                            show_created_configuration_menu(index, configurations)
+                    case _: pass
+            if key == b'\r': # Enter key
+                if index == len(configurations) + 1:
+                    break
+                pass # TODO
+
+            if key == b'\x1b': # Esc Key
+                break
+
+    config["configurations"] = configurations
+    return config
+
