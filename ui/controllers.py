@@ -157,16 +157,26 @@ def created_configuration_menu(config: dict) -> dict:
                     break
                 if index == len(configurations):  # Create new configuration
                     new_config = create_or_edit_configuration(configurations)
+                    clear_cmd()
+                    show_created_configuration_menu(index, configurations)
                     if new_config is not None:
                         configurations.append(new_config)
+                        clear_cmd()
+                        show_created_configuration_menu(index, configurations)
+                        print("Successfully created!")
+                    else:
+                        print("Aborted.")
+                else:  # Edit configuration
+                    updated_configuration = create_or_edit_configuration(configurations, configurations[index].copy(), False, index)
                     clear_cmd()
                     show_created_configuration_menu(index, configurations)
-                else:  # Edit configuration
-                    updated_configuration = create_or_edit_configuration(configurations, configurations[index], False, index)
                     if updated_configuration is not None:
                         configurations[index] = updated_configuration
-                    clear_cmd()
-                    show_created_configuration_menu(index, configurations)
+                        clear_cmd()
+                        show_created_configuration_menu(index, configurations)
+                        print("Successfully updated!")
+                    else:
+                        print("Aborted.")
 
             if key == b'\x1b': # Esc Key
                 break

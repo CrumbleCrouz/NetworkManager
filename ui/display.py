@@ -124,7 +124,7 @@ def show_create_or_edit_configuration(index: int = 0, configuration: dict = None
             if prop not in ["Name", "DHCP", "DNS"]:
                 print(f"║ [{'x' if index == c else ' '}] ║ {(prop)}: {str(configuration[prop]) + ' ' * (max_length - len(str(configuration[prop])) - len(prop) - 2)} ║")
                 c += 1
-            elif prop is "DNS":
+            elif prop == "DNS":
                 print(f"║     ║ {prop}: {' ' * (max_length - len(prop) - 2)} ║")
                 for srv in configuration[prop]:
                     print(f"║ [{'x' if index == c else ' '}] ║  - {srv + ' ' * (max_length - len(srv) - 3)} ║")
