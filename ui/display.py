@@ -21,12 +21,14 @@ def show_main_menu(index: int = 0) -> None:
     print(f"╚═════╩═══════════════════════════╝")
 
 
-def show_current_configuration(index: int = 0, adapters: list = []) -> None:
+def show_current_configuration(index: int = 0, adapters: list = None) -> None:
     """
     Displays the current configurations.
     :param index: Starting index.
     :param adapters: A list containing all adapters.
     """
+    if adapters is None:
+        adapters = []
     max_name_length = max(len(adapter.Name) for adapter in adapters)
     max_name_length = max(max_name_length, 7)  # 7 is the length of "Go back"
     print(f"╔═════╦═{'═' * max_name_length}═╗")
@@ -124,7 +126,7 @@ def show_create_or_edit_configuration(index: int = 0, configuration: dict = None
     if not configuration["DHCP"]:
         for prop in configuration.keys():
             if prop not in ["Name", "DHCP", "DNS"]:
-                print(f"║ [{'x' if index == c else ' '}] ║ {(prop)}: {str(configuration[prop]) + ' ' * (max_length - len(str(configuration[prop])) - len(prop) - 2)} ║")
+                print(f"║ [{'x' if index == c else ' '}] ║ {prop}: {str(configuration[prop]) + ' ' * (max_length - len(str(configuration[prop])) - len(prop) - 2)} ║")
                 c += 1
             elif prop == "DNS":
                 print(f"║     ║ {prop}: {' ' * (max_length - len(prop) - 2)} ║")

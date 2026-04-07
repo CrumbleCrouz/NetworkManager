@@ -119,7 +119,7 @@ def adapter_details(adapter: wmi.WMIObject = None):
 # Create new configuration #
 ############################
 
-def created_configuration_menu(config: dict) -> dict:
+def created_configuration_menu(config: dict) -> list:
     """
     Displays the created network configurations menu and handle the users input.
     :param config: The program configuration.
@@ -138,7 +138,7 @@ def created_configuration_menu(config: dict) -> dict:
     while True:
         if msvcrt.kbhit():
             key = msvcrt.getch()
-            if key == b'\xe0': # Arrow Key
+            if key == b'\xe0': # Arrow Key / Del
                 arrow = msvcrt.getch()
                 match arrow:
                     case  b'H': # Up Arrow
@@ -151,6 +151,17 @@ def created_configuration_menu(config: dict) -> dict:
                             index += 1
                             clear_cmd()
                             show_created_configuration_menu(index, configurations)
+                    case b'S': # Delete Key
+                        if index < len(configurations):
+                            print("Are you sure to delete this configuration ?")
+                            if input("Type \"yes\" to confirm: ") == "yes":
+                                configurations.pop(index)
+                                clear_cmd()
+                                show_created_configuration_menu(index, configurations)
+                                print("Successfully deleted!")
+                            clear_cmd()
+                            show_created_configuration_menu(index, configurations)
+                            print("Aborted.")
                     case _: pass
             if key == b'\r': # Enter key
                 if index == len(configurations) + 1:  # Go Back
@@ -184,7 +195,6 @@ def created_configuration_menu(config: dict) -> dict:
 
             if key == b'\x1b': # Esc Key
                 break
-
     return configurations
 
 
