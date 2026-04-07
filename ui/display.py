@@ -102,9 +102,10 @@ def show_create_or_edit_configuration(index: int = 0, configuration: dict = None
     go_back = "Go back"
     validate = "Create new Configuration" if create else "Update Configuration"
     add_dns = "create new DNS server"
+    delete = "Delete configuration"
     indication_1 = "Type Enter to edit the selected field"
     indication_2 = "Going back will not save changes"
-    dns_length = sum(len(dns) for dns in configuration["DNS"])
+    dns_length = max((len(dns) for dns in configuration["DNS"] if len(configuration["DNS"]) > 0), default=0)
     max_length = max((len(str(configuration[prop])) for prop in configuration.keys() if prop != "DNS"), default=0)
     max_length = max(
         max_length,
@@ -112,6 +113,7 @@ def show_create_or_edit_configuration(index: int = 0, configuration: dict = None
         len(go_back),
         len(validate),
         len(add_dns),
+        len(delete),
         len(indication_1),
         len(indication_2),
         len(configuration["Name"])
@@ -133,11 +135,14 @@ def show_create_or_edit_configuration(index: int = 0, configuration: dict = None
                 c += 1
     print(f"║ [{'x' if index == c else ' '}] ║ DHCP: {str(configuration["DHCP"]) + ' ' * (max_length - len(str(configuration["DHCP"])) - 6)} ║")
     print(f"║ [{'x' if index == c + 1 else ' '}] ║ {validate + ' ' * (max_length - len(validate))} ║")
-    print(f"║ [{'x' if index == c + 2 else ' '}] ║ {go_back + ' ' * (max_length - len(go_back))} ║")
+    if not create:
+        print(f"║ [{'x' if index == c + 2 else ' '}] ║ {delete + ' ' * (max_length - len(delete))} ║")
+    print(f"║ [{'x' if index == c + (3 if not create else 2) else ' '}] ║ {go_back + ' ' * (max_length - len(go_back))} ║")
 
     print(f"╠═{'═' * 3}═╩═{'═' * max_length}═╣")
     print(f"║ {indication_1.center(6 + max_length)} ║")
     print(f"║ {indication_2.center(6 + max_length)} ║")
     print(f"║ {''.center(6 + max_length)} ║")
     print(f"╚═{'═' * (max_length + 6)}═╝")
+    print(index)
     # ╔ ╗ ═ ║ ╠ ╦ ╬ ╩ ╣ ╚ ╝

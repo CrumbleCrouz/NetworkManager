@@ -171,10 +171,14 @@ def created_configuration_menu(config: dict) -> dict:
                     clear_cmd()
                     show_created_configuration_menu(index, configurations)
                     if updated_configuration is not None:
-                        configurations[index] = updated_configuration
-                        clear_cmd()
-                        show_created_configuration_menu(index, configurations)
-                        print("Successfully updated!")
+                        if len(updated_configuration.keys()) > 0:
+                            configurations[index] = updated_configuration
+                            print("Successfully updated!")
+                        else:
+                            configurations.pop(index)
+                            clear_cmd()
+                            show_created_configuration_menu(index, configurations)
+                            print("Successfully deleted!")
                     else:
                         print("Aborted.")
 
@@ -208,9 +212,9 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
     show_create_or_edit_configuration(0, configuration, create)
     while True:
         if configuration["DHCP"]:
-            max_index = 3
+            max_index = 3 + (1 if not create else 0)
         else:
-            max_index = len(configuration.keys()) + len(configuration["DNS"]) + 1
+            max_index = len(configuration.keys()) + len(configuration["DNS"]) + 1 + (1 if not create else 0)
         if msvcrt.kbhit():
             key = msvcrt.getch()
             if key == b'\xe0': # Arrow Key
@@ -221,11 +225,13 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
                             index -= 1
                             clear_cmd()
                             show_create_or_edit_configuration(index, configuration, create)
+                            print(max_index)
                     case b'P': # Down Arrow
                         if index < max_index:
                             index += 1
                             clear_cmd()
                             show_create_or_edit_configuration(index, configuration, create)
+                            print(max_index)
                     case _: pass
 
             if key == b'\r': # Enter key
@@ -289,8 +295,8 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
                         print("Gateway updated!")
                     else:
                         print("Invalid IP!")
-                if (not configuration["DHCP"]) and index in range(4, max_index - 2):  # DNS
-                    if index == max_index - 3:  # Add DNS
+                if (not configuration["DHCP"]) and index in range(4, max_index - (3 if (not create) else 2)):  # DNS
+                    if index == max_index - (4 if (not create) else 3):  # Add DNS
                         dns = input("Enter new DNS: ")
                         clear_cmd()
                         show_create_or_edit_configuration(index, configuration, create)
@@ -318,7 +324,7 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
                         else:
                             print("Invalid DNS!")
 
-                if index == max_index - 2:  # DHCP
+                if index == max_index - (3 if (not create) else 2):  # DHCP
                     configuration["DHCP"] = not configuration["DHCP"]
                     clear_cmd()
                     if configuration["DHCP"]:
@@ -327,23 +333,50 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
                         index = len(configuration.keys()) + len(configuration["DNS"]) -1
                     show_create_or_edit_configuration(index, configuration, create)
                     print("DHCP updated")
-                if index == max_index - 1:  # Validate
+                if index == max_index - (2 if (not create) else 1):  # Validate
+                    # clear_cmd()
+                    # show_create_or_edit_configuration(index, configuration, create)
+                    print("Would you want to save the configuration ?")
+                    if input("Type \"yes\" to confirm: ") == "yes":
+                        if len(configurations) > 0:
+                            config_name_list = [n["Name"].lower() for n in configurations]
+                            config_name_list.pop(config_index)
+                            if configuration["Name"].lower() in config_name_list:
+                                print("A configuration with this name already exists!")
+                                continue
+                        if verify_configuration(configuration):
+                            return configuration
+                        else:
+                            clear_cmd()
+                            show_create_or_edit_configuration(index, configuration, create)
+                            print("Cannot validate, invalid configuration!")
+                    else:
+                        clear_cmd()
+                        show_create_or_edit_configuration(index, configuration, create)
+                        print("Aborted.")
+                if (not create) and index == max_index - 1:  # Delete
+                    # clear_cmd()
+                    # show_create_or_edit_configuration(index, configuration, create)
+                    print("Are you sure to delete this configuration ?")
+                    if input("Type \"yes\" to confirm: ") == "yes":
+                        return {}
                     clear_cmd()
                     show_create_or_edit_configuration(index, configuration, create)
-                    if len(configurations) > 0:
-                        config_name_list = [n["Name"].lower() for n in configurations]
-                        config_name_list.pop(config_index)
-                        if configuration["Name"].lower() in config_name_list:
-                            print("A configuration with this name already exists!")
-                            continue
-                    if verify_configuration(configuration):
-                        return configuration
-                    else:
-                        print("Cannot validate, invalid configuration!")
+                    print("Aborted.")
                 if index == max_index:  # Go back
-                    break
+                    print("Would you want to discard your changes ?")
+                    if input("Type \"yes\" to confirm: ") == "yes":
+                        break
+                    clear_cmd()
+                    show_create_or_edit_configuration(index, configuration, create)
+                    print("Aborted.")
 
             if key == b'\x1b': # Esc Key
-                break
+                print("Would you want to discard your changes ?")
+                if input("Type \"yes\" to confirm: ") == "yes":
+                    break
+                clear_cmd()
+                show_create_or_edit_configuration(index, configuration, create)
+                print("Aborted.")
 
     return None

@@ -13,7 +13,7 @@ def load_config() -> dict:
     try:
         with open(config_path, 'r') as f:
             config = json.load(f)
-    except FileNotFoundError:
+    except Exception:
         pass
 
     for v in ["excludedAdapters", "configurations"]:
