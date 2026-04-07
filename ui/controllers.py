@@ -235,13 +235,11 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
                             index -= 1
                             clear_cmd()
                             show_create_or_edit_configuration(index, configuration, create)
-                            print(max_index)
                     case b'P': # Down Arrow
                         if index < max_index:
                             index += 1
                             clear_cmd()
                             show_create_or_edit_configuration(index, configuration, create)
-                            print(max_index)
                     case _: pass
 
             if key == b'\r': # Enter key
