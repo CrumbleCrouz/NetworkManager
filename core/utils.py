@@ -1,5 +1,6 @@
 # Python Modules
 import ctypes
+import os
 import sys
 from typing import Callable
 
@@ -17,6 +18,7 @@ def is_admin() -> bool:
 def run_as_admin(fn: Callable[[], None] = lambda: None) -> None:
     """
     Runs the app as an administrator.
+    :param fn: The function to be executed as administrator.
     """
     if not is_admin():
         print("Requesting Administrator privileges...")
@@ -39,6 +41,7 @@ def run_as_admin(fn: Callable[[], None] = lambda: None) -> None:
     else:
         print("Launching application...")
         fn()
+        os.system("pause")
 
 
 def enable_ansi() -> None:

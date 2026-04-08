@@ -3,9 +3,6 @@ from core.utils import *
 from core.serialization import *
 from ui.controllers import *
 
-# Python Modules
-import os
-
 
 def main():
     """
@@ -14,16 +11,14 @@ def main():
     enable_ansi()
     clear_cmd()
     config = load_config()
-    config = main_menu(config)
-    save_config(config)
-
-
-if __name__ == "__main__":
     try:
-        # run_as_admin(main)
-        main()
+        config = main_menu(config)
     except KeyboardInterrupt:
         pass
     finally:
+        save_config(config)
         print("Exiting program...")
-        os.system("pause")
+
+
+if __name__ == "__main__":
+    run_as_admin(main)

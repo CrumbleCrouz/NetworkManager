@@ -19,7 +19,7 @@ def load_config() -> dict:
     for v in ["excludedAdapters", "configurations"]:
         try:
             config[v]
-        except KeyError: # Default values
+        except KeyError:  # Default values
             config[v] = []
             if v == "excludedAdapters":
                 config[v] = ["docker", "virtual", "vmware", "loopback", "vethernet",

@@ -18,21 +18,21 @@ def main_menu(config: dict) -> dict:
     while True:
         if msvcrt.kbhit():
             key = msvcrt.getch()
-            if key == b'\xe0': # Arrow Key
+            if key == b'\xe0':  # Arrow Key
                 arrow = msvcrt.getch()
                 match arrow:
-                    case  b'H': # Up Arrow
+                    case  b'H':  # Up Arrow
                         if index > 0:
                             index -= 1
                             clear_cmd()
                             show_main_menu(index)
-                    case b'P': # Down Arrow
+                    case b'P':  # Down Arrow
                         if index < 3:
                             index += 1
                             clear_cmd()
                             show_main_menu(index)
                     case _: pass
-            if key == b'\r': # Enter key
+            if key == b'\r':  # Enter key
                 match index:
                     case 0:  # Saved configurations
                         pass
@@ -51,7 +51,7 @@ def main_menu(config: dict) -> dict:
                         break
                     case _:
                         pass
-            if key == b'\x1b': # Esc Key
+            if key == b'\x1b':  # Esc Key
                 break
 
     return config
@@ -74,28 +74,28 @@ def current_configuration(config: dict) -> None:
     while True:
         if msvcrt.kbhit():
             key = msvcrt.getch()
-            if key == b'\xe0': # Arrow Key
+            if key == b'\xe0':  # Arrow Key
                 arrow = msvcrt.getch()
                 match arrow:
-                    case  b'H': # Up Arrow
+                    case  b'H':  # Up Arrow
                         if index > 0:
                             index -= 1
                             clear_cmd()
                             show_current_configuration(index, adapters)
-                    case b'P': # Down Arrow
+                    case b'P':  # Down Arrow
                         if index < len(adapters):
                             index += 1
                             clear_cmd()
                             show_current_configuration(index, adapters)
                     case _: pass
-            if key == b'\r': # Enter key
+            if key == b'\r':  # Enter key
                 if index == len(adapters):
                     break
                 clear_cmd()
                 adapter_details(adapters[index])
                 clear_cmd()
                 show_current_configuration(index, adapters)
-            if key == b'\x1b': # Esc Key
+            if key == b'\x1b':  # Esc Key
                 break
 
 
@@ -138,20 +138,20 @@ def created_configuration_menu(config: dict) -> list:
     while True:
         if msvcrt.kbhit():
             key = msvcrt.getch()
-            if key == b'\xe0': # Arrow Key / Del
+            if key == b'\xe0':  # Arrow Key / Del
                 arrow = msvcrt.getch()
                 match arrow:
-                    case  b'H': # Up Arrow
+                    case  b'H':  # Up Arrow
                         if index > 0:
                             index -= 1
                             clear_cmd()
                             show_created_configuration_menu(index, configurations)
-                    case b'P': # Down Arrow
+                    case b'P':  # Down Arrow
                         if index < len(configurations) + 1:
                             index += 1
                             clear_cmd()
                             show_created_configuration_menu(index, configurations)
-                    case b'S': # Delete Key
+                    case b'S':  # Delete Key
                         if index < len(configurations):
                             print("Are you sure to delete this configuration ?")
                             if input("Type \"yes\" to confirm: ") == "yes":
@@ -163,7 +163,7 @@ def created_configuration_menu(config: dict) -> list:
                             show_created_configuration_menu(index, configurations)
                             print("Aborted.")
                     case _: pass
-            if key == b'\r': # Enter key
+            if key == b'\r':  # Enter key
                 if index == len(configurations) + 1:  # Go Back
                     break
                 if index == len(configurations):  # Create new configuration
@@ -184,6 +184,8 @@ def created_configuration_menu(config: dict) -> list:
                     if updated_configuration is not None:
                         if len(updated_configuration.keys()) > 0:
                             configurations[index] = updated_configuration
+                            clear_cmd()
+                            show_created_configuration_menu(index, configurations)
                             print("Successfully updated!")
                         else:
                             configurations.pop(index)
@@ -193,7 +195,7 @@ def created_configuration_menu(config: dict) -> list:
                     else:
                         print("Aborted.")
 
-            if key == b'\x1b': # Esc Key
+            if key == b'\x1b':  # Esc Key
                 break
     return configurations
 
@@ -227,22 +229,22 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
             max_index = len(configuration.keys()) + len(configuration["DNS"]) + 1 + (1 if not create else 0)
         if msvcrt.kbhit():
             key = msvcrt.getch()
-            if key == b'\xe0': # Arrow Key
+            if key == b'\xe0':  # Arrow Key
                 arrow = msvcrt.getch()
                 match arrow:
-                    case  b'H': # Up Arrow
+                    case  b'H':  # Up Arrow
                         if index > 0:
                             index -= 1
                             clear_cmd()
                             show_create_or_edit_configuration(index, configuration, create)
-                    case b'P': # Down Arrow
+                    case b'P':  # Down Arrow
                         if index < max_index:
                             index += 1
                             clear_cmd()
                             show_create_or_edit_configuration(index, configuration, create)
                     case _: pass
 
-            if key == b'\r': # Enter key
+            if key == b'\r':  # Enter key
                 if index == 0:  # Name
                     name = input("Enter new Name: ")
                     clear_cmd()
@@ -342,8 +344,6 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
                     show_create_or_edit_configuration(index, configuration, create)
                     print("DHCP updated")
                 if index == max_index - (2 if (not create) else 1):  # Validate
-                    # clear_cmd()
-                    # show_create_or_edit_configuration(index, configuration, create)
                     print("Would you want to save the configuration ?")
                     if input("Type \"yes\" to confirm: ") == "yes":
                         if len(configurations) > 0:
@@ -363,8 +363,6 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
                         show_create_or_edit_configuration(index, configuration, create)
                         print("Aborted.")
                 if (not create) and index == max_index - 1:  # Delete
-                    # clear_cmd()
-                    # show_create_or_edit_configuration(index, configuration, create)
                     print("Are you sure to delete this configuration ?")
                     if input("Type \"yes\" to confirm: ") == "yes":
                         return {}
@@ -379,7 +377,7 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
                     show_create_or_edit_configuration(index, configuration, create)
                     print("Aborted.")
 
-            if key == b'\x1b': # Esc Key
+            if key == b'\x1b':  # Esc Key
                 print("Would you want to discard your changes ?")
                 if input("Type \"yes\" to confirm: ") == "yes":
                     break
