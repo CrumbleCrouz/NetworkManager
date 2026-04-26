@@ -6,6 +6,10 @@ from core.manager import *
 import msvcrt
 
 
+#############
+# Main menu #
+#############
+
 def main_menu(config: dict) -> dict:
     """
     Displays the main menu and handle the users input.
@@ -35,7 +39,10 @@ def main_menu(config: dict) -> dict:
             if key == b'\r':  # Enter key
                 match index:
                     case 0:  # Saved configurations
-                        pass
+                        clear_cmd()
+                        saved_configuration(config)
+                        clear_cmd()
+                        show_main_menu(index)
                     case 1:  # Create new configuration
                         clear_cmd()
                         configurations = created_configuration_menu(config)
@@ -57,13 +64,13 @@ def main_menu(config: dict) -> dict:
     return config
 
 
-#############################
-# See current configuration #
-#############################
+#####################################
+# See current network configuration #
+#####################################
 
 def current_configuration(config: dict) -> None:
     """
-    Displays the current configurations and handle the users input.
+    Displays the current network adapters and handle the users input.
     :param config: The program configuration.
     """
     index = 0
@@ -386,3 +393,106 @@ def create_or_edit_configuration(configurations: list, configuration: dict = Non
                 print("Aborted.")
 
     return None
+
+
+#############################
+# Apply Saved configuration #
+#############################
+
+def saved_configuration(config: dict) -> None:
+    """
+    Displays the saved network configurations menu and handle the users input.
+    :param config: The program configuration.
+    """
+    index = 0
+    configurations = None
+    try:
+        configurations = config["configurations"]
+    except:
+        pass
+    if configurations is None:
+        configurations = []
+    clear_cmd()
+    show_apply_configuration_menu(0, configurations)
+    while True:
+        if msvcrt.kbhit():
+            key = msvcrt.getch()
+            if key == b'\xe0':  # Arrow Key / Del
+                arrow = msvcrt.getch()
+                match arrow:
+                    case b'H':  # Up Arrow
+                        if index > 0:
+                            index -= 1
+                            clear_cmd()
+                            show_apply_configuration_menu(index, configurations)
+                    case b'P':  # Down Arrow
+                        if index < len(configurations):
+                            index += 1
+                            clear_cmd()
+                            show_apply_configuration_menu(index, configurations)
+                    case _:
+                        pass
+            if key == b'\r':  # Enter key
+                if index == len(configurations):  # Go Back
+                    break
+                else:  # Apply configuration
+                    if select_adapter_to_apply_menu(config, configurations[index]):
+                        break
+
+                    clear_cmd()
+                    show_apply_configuration_menu(index, configurations)
+
+            if key == b'\x1b':  # Esc Key
+                break
+    return
+
+
+def select_adapter_to_apply_menu(config: dict, configuration: dict) -> bool:
+    """
+    Displays the menu to select the network adapter to apply the configuration and handle the users input.
+    :param config: The program configuration.
+    :param configuration: The network configuration to apply.
+    :return: True if the configuration was applied, False otherwise.
+    """
+    clear_cmd()
+    index = 0
+    print("Fetching adapters...")
+    adapters = list_adapters(config)
+    clear_cmd()
+    show_select_adapter_to_apply_menu(0, adapters)
+    while True:
+        if msvcrt.kbhit():
+            key = msvcrt.getch()
+            if key == b'\xe0':  # Arrow Key
+                arrow = msvcrt.getch()
+                match arrow:
+                    case b'H':  # Up Arrow
+                        if index > 0:
+                            index -= 1
+                            clear_cmd()
+                            show_select_adapter_to_apply_menu(index, adapters)
+                    case b'P':  # Down Arrow
+                        if index < len(adapters):
+                            index += 1
+                            clear_cmd()
+                            show_select_adapter_to_apply_menu(index, adapters)
+                    case _:
+                        pass
+            if key == b'\r':  # Enter key
+                if index == len(adapters):  # Go Back
+                    break
+                else:  # Apply configuration
+                    clear_cmd()
+                    if apply_configuration(adapters[index], configuration):
+                        print("Successfully applied!")
+                        input("Press Enter to continue...")
+                        return True
+                    else:
+                        print("Failed to apply! Please verify that the current adapter is connected to a network.")
+                        input("Press Enter to continue...")
+                        clear_cmd()
+                        show_select_adapter_to_apply_menu(index, adapters)
+
+            if key == b'\x1b':  # Esc Key
+                break
+    return False

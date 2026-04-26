@@ -13,17 +13,17 @@ def show_main_menu(index: int = 0) -> None:
     Displays the main menu.
     :param index: Starting index.
     """
-    print(f"╔═════╦═══════════════════════════╗")
-    print(f"║ [{'x' if index == 0 else ' '}] ║ Saved configurations      ║ - Not implemented yet -")
-    print(f"║ [{'x' if index == 1 else ' '}] ║ Manage configuration      ║ - Working on it -")
-    print(f"║ [{'x' if index == 2 else ' '}] ║ See current configuration ║")
-    print(f"║ [{'x' if index == 3 else ' '}] ║ Exit                      ║")
-    print(f"╚═════╩═══════════════════════════╝")
+    print(f"╔═════╦═══════════════════════════════════╗")
+    print(f"║ [{'x' if index == 0 else ' '}] ║ Apply saved configurations        ║")
+    print(f"║ [{'x' if index == 1 else ' '}] ║ Manage configuration              ║")
+    print(f"║ [{'x' if index == 2 else ' '}] ║ See current network configuration ║")
+    print(f"║ [{'x' if index == 3 else ' '}] ║ Exit                              ║")
+    print(f"╚═════╩═══════════════════════════════════╝")
 
 
 def show_current_configuration(index: int = 0, adapters: list = None) -> None:
     """
-    Displays the current configurations.
+    Displays all the network adapters.
     :param index: Starting index.
     :param adapters: A list containing all adapters.
     """
@@ -146,4 +146,54 @@ def show_create_or_edit_configuration(index: int = 0, configuration: dict = None
     print(f"║ {indication_2.center(6 + max_length)} ║")
     print(f"║ {''.center(6 + max_length)} ║")
     print(f"╚═{'═' * (max_length + 6)}═╝")
-    # ╔ ╗ ═ ║ ╠ ╦ ╬ ╩ ╣ ╚ ╝
+
+
+def show_apply_configuration_menu(index: int = 0, configurations: list = None) -> None:
+    """
+    Displays the saved configurations.
+    :param index: Starting index.
+    :param configurations: The saved configurations.
+    """
+    if configurations is None:
+        configurations = []
+    indication_1 = "Select a configuration"
+    indication_2 = "to apply it"
+    go_back = "Go back"
+    max_length = max(len(config["Name"]) for config in configurations) if len(configurations) > 0 else 0
+    max_length = max(max_length, len(indication_1), len(indication_2))
+    print(f"╔═════╦═{'═' * max_length}═╗")
+    c = 0
+    for config in configurations:
+        print(
+            f"║ [{'x' if index == c else ' '}] ║ {config["Name"] + ' ' * (max_length - len(config["Name"]))} ║")
+        c += 1
+    print(f"║ [{'x' if index == c else ' '}] ║ {go_back + ' ' * (max_length - len(go_back))} ║")
+    print(f"╠═{'═' * 3}═╩═{'═' * max_length}═╣")
+    print(f"║ {indication_1.center(6 + max_length)} ║")
+    print(f"║ {indication_2.center(6 + max_length)} ║")
+    print(f"╚═{'═' * (max_length + 6)}═╝")
+
+
+def show_select_adapter_to_apply_menu(index: int = 0, adapters: list = None) -> None:
+    """
+    Displays the network adapters to apply the configuration.
+    :param index: Starting index.
+    :param adapters: The adapters list.
+    """
+    if adapters is None:
+        adapters = []
+    indication_1 = "Select an adapter to apply"
+    indication_2 = "the configuration"
+    go_back = "Go back"
+    max_length = max(len(adapter.Name) for adapter in adapters)
+    max_length = max(max_length, len(indication_1), len(indication_2))
+    print(f"╔═════╦═{'═' * max_length}═╗")
+    c = 0
+    for adapter in adapters:
+        print(f"║ [{'x' if index == c else ' '}] ║ {adapter.Name + ' ' * (max_length - len(adapter.Name))} ║")
+        c += 1
+    print(f"║ [{'x' if index == c else ' '}] ║ {go_back + ' ' * (max_length - len(go_back))} ║")
+    print(f"╠═{'═' * 3}═╩═{'═' * max_length}═╣")
+    print(f"║ {indication_1.center(6 + max_length)} ║")
+    print(f"║ {indication_2.center(6 + max_length)} ║")
+    print(f"╚═{'═' * (max_length + 6)}═╝")

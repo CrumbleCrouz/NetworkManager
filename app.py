@@ -15,6 +15,8 @@ def main():
         config = main_menu(config)
     except KeyboardInterrupt:
         pass
+    except Exception as e:
+        print(e)
     finally:
         save_config(config)
         print("Exiting program...")

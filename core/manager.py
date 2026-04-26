@@ -1,5 +1,6 @@
 # Python Modules
 import re
+from typing import Any
 
 # External Modules
 import wmi
@@ -86,3 +87,41 @@ def verify_configuration(config: dict) -> bool:
             return False
 
     return True
+
+
+def apply_configuration(adapter: wmi.WMIObject, config_to_apply: dict) -> bool:
+    """
+    Applies the network configuration to a specific adapter.
+    :param adapter: The Win32_NetworkAdapter hardware object.
+    :param config_to_apply: The configuration to apply.
+    :return: True if the configuration is applied, False otherwise.
+    """
+    c = wmi.WMI()
+
+    configs = c.Win32_NetworkAdapterConfiguration(Index=adapter.Index)
+    if not configs:
+        print("Configuration not found!")
+        return False
+
+    print("Applying the configuration...")
+    adapter_config = configs[0]
+
+    if config_to_apply.get("DHCP"):
+        res_ip = adapter_config.EnableDHCP()
+        res_dns = adapter_config.SetDNSServerSearchOrder([])
+        return res_ip[0] == 0 and res_dns[0] == 0
+    else:
+        res_ip = adapter_config.EnableStatic(
+            IPAddress=[config_to_apply["IP"]],
+            SubnetMask=[config_to_apply["Mask"]]
+        )
+
+        if config_to_apply.get("Gateway"):
+            adapter_config.SetGateways(
+                DefaultIPGateway=[config_to_apply["Gateway"]])
+
+        if config_to_apply.get("DNS"):
+            adapter_config.SetDNSServerSearchOrder(
+                DNSServerSearchOrder=config_to_apply["DNS"])
+
+        return res_ip[0] == 0
