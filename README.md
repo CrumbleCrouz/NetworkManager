@@ -6,8 +6,8 @@
 ## 🌍 Documentation by Langage
 | Language | Status |
 | :--- | :--- |
-| [**English**](./doc/EN.md) | 🚧 Work in Progress... |
-| [**Français**](./doc/FR.md) | 🚧 Travail en cours... |
+| [**English**](./doc/EN.md) | ✅ Release V1.0 |
+| [**Français**](./doc/FR.md) | ✅ Release V1.0 |
 
 ---
 
@@ -19,7 +19,7 @@
 
 ## 🔴 Requirements
 * **Platform:** Windows 8.1 or later (Windows 10 Recommended)
-* **Python Version:** `3.11`
+* **Python Version:** `3.14`
 * **Privileges:** Administrator permission (UAC) is required to modify network settings.
 
 ## 🛠️ Installation
